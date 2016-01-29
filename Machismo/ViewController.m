@@ -7,40 +7,45 @@
 //
 
 #import "ViewController.h"
- 
+#import "Deck.h"
+#import "PlayingCardDeck.h"
+#import "CardMatchingGame.h"
+
 @interface ViewController ()
 
-@property (weak, nonatomic) IBOutlet UILabel *flipsLabel;
-
-@property (nonatomic) int flipCount;
+@property (strong, nonatomic) IBOutletCollection(UIButton) NSArray *cardButton;
+@property (nonatomic, strong) Deck *deck;
+@property (nonatomic, strong) CardMatchingGame *game;
 @end
 
 @implementation ViewController
 
-- (void) setFlipCount:(int)flipCount {
-    _flipCount = flipCount;
-    self.flipsLabel.text = [NSString stringWithFormat:@"Flips: %d", self.flipCount];
-    NSLog(@"flipCount = %d", self.flipCount);
+- (CardMatchingGame *)game
+{
+    if (!_game) _game = [[CardMatchingGame alloc] initWithCardCount:[self.cardButton count] usingDeck:[self createDeck]];
+    return _game;
+}
+
+- (Deck *)createDeck
+{
+    return [[PlayingCardDeck alloc] init];
 }
 
 - (IBAction)touchCardButton:(UIButton *)sender {
-    
-    if ([sender.currentTitle length]) {
-        [sender setBackgroundImage:[UIImage imageNamed: @"cardback"]
-                          forState:UIControlStateNormal];
-        
-        [sender setTitle:@"" forState:UIControlStateNormal];
-    } else {
-        [sender setBackgroundImage:[UIImage imageNamed: @"cardfront"]
-                          forState:UIControlStateNormal];
-        
-        [sender setTitle:@"A♣︎" forState:UIControlStateNormal];
-
-    }
-    self.flipCount++;
-    
+    int cardIndex = [self.cardButton indexOfObject:sender];
+    [self.game chooseCardAtIndex:cardIndex];
+    [self updateUI];
 }
 
-
+- (void)updateUI
+{
+    for (UIButton *cardButton in self.cardButton) {
+        int cardIndex = [self.cardButton indexOfObject:cardButton];
+        Card *card = [self.game cardAtIndex:cardIndex];
+        [cardButton setTitle: forState:UIControlStateNormal];
+        [cardButton setBackgroundImage:<#(nullable UIImage *)#> forState:UIControlStateNormal];
+        cardButton.enabled = !card.isMatched;
+    }
+}
 
 @end
