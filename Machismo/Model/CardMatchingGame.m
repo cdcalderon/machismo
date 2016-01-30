@@ -49,7 +49,7 @@ static const int MATCH_BONUS = 4;
     Card *card = [self cardAtIndex:index];
     
     if (!card.isMatched) {
-        if (!card.isChosen) {
+        if (card.isChosen) {
             card.chosen = NO;
         } else {
             //match against another card
@@ -69,7 +69,8 @@ static const int MATCH_BONUS = 4;
             }
             self.score -= COST_TO_CHOOSE;
             card.chosen = YES;
-        }}
+        }
+    }
 }
 
 - (Card *)cardAtIndex:(NSUInteger)index
